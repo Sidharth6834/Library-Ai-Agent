@@ -1,0 +1,15 @@
+{
+  "checkedOut": {
+    "CS001": 1
+  },
+  "reservations": [
+    {
+      "bookId": "CS001",
+      "studentId": "132312",
+      "studentName": "Sidharth Kumar",
+      "reservedAt": "2026-09-10T06:39:42.669Z",
+      "status": "reserved"
+    }
+  ],
+  "notifications": {}
+}

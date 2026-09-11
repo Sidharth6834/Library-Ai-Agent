@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Library AI Agent — IBM Granite</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <!-- ── SIDEBAR ──────────────────────────────────────── -->
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-header">
+      <div class="logo">
+        <div class="logo-icon">📚</div>
+        <div>
+          <div class="logo-title">LibraryBot</div>
+          <div class="logo-sub">IBM Granite AI</div>
+        </div>
+      </div>
+      <button class="sidebar-toggle" id="sidebarToggle" title="Toggle Sidebar">☰</button>
+    </div>
+
+    <!-- Student Profile -->
+    <div class="sidebar-section">
+      <div class="section-label">Student Profile</div>
+      <input class="input-field" id="studentName" placeholder="Full Name" />
+      <input class="input-field" id="studentId" placeholder="Student ID" />
+      <input class="input-field" id="studentMajor" placeholder="Major / Programme" />
+      <select class="input-field" id="studentYear">
+        <option value="">Year of Study</option>
+        <option value="1st Year">1st Year</option>
+        <option value="2nd Year">2nd Year</option>
+        <option value="3rd Year">3rd Year</option>
+        <option value="4th Year">4th Year</option>
+        <option value="Postgraduate">Postgraduate</option>
+      </select>
+      <button class="btn btn-primary" id="saveProfile">Save Profile</button>
+    </div>
+
+    <!-- Library Stats -->
+    <div class="sidebar-section">
+      <div class="section-label">Library Stats</div>
+      <div class="stats-grid" id="statsGrid">
+        <div class="stat-card"><span class="stat-val" id="statTitles">—</span><span class="stat-label">Titles</span></div>
+        <div class="stat-card"><span class="stat-val" id="statAvail">—</span><span class="stat-label">Available</span></div>
+        <div class="stat-card"><span class="stat-val" id="statOut">—</span><span class="stat-label">Checked Out</span></div>
+        <div class="stat-card"><span class="stat-val" id="statSubjects">—</span><span class="stat-label">Subjects</span></div>
+      </div>
+    </div>
+
+    <!-- Quick Suggestions -->
+    <div class="sidebar-section">
+      <div class="section-label">Quick Queries</div>
+      <div class="suggestions">
+        <button class="suggestion-btn" data-q="I need books on machine learning for my data science course">Machine Learning</button>
+        <button class="suggestion-btn" data-q="Recommend books on algorithms and data structures">Algorithms</button>
+        <button class="suggestion-btn" data-q="What Python programming books do you have available?">Python Books</button>
+        <button class="suggestion-btn" data-q="Show me high-demand books I should borrow soon">High Demand</button>
+        <button class="suggestion-btn" data-q="I'm studying linear algebra. What books are available?">Linear Algebra</button>
+        <button class="suggestion-btn" data-q="What software engineering books are in stock?">Software Engineering</button>
+      </div>
+    </div>
+
+    <!-- My Reservations -->
+    <div class="sidebar-section">
+      <div class="section-label">My Reservations</div>
+      <div id="myReservations" class="reservation-list">
+        <div class="empty-state">Log in to see your reservations</div>
+      </div>
+    </div>
+
+    <!-- Notifications -->
+    <div class="sidebar-section">
+      <div class="section-label" style="display:flex;justify-content:space-between;align-items:center;">
+        <span>Notifications</span>
+        <span class="notif-badge hidden" id="notifBadge">0</span>
+      </div>
+      <div id="notifList" class="reservation-list">
+        <div class="empty-state">No notifications yet</div>
+      </div>
+    </div>
+  </aside>
+
+  <!-- ── MAIN CONTENT ──────────────────────────────────── -->
+  <main class="main" id="mainContent">
+
+    <!-- Top Nav -->
+    <header class="topnav">
+      <div class="topnav-left">
+        <button class="nav-toggle" id="navToggle">☰</button>
+        <h1 class="page-title">Library AI Agent</h1>
+        <span class="badge">IBM Granite 4 · Powered by watsonx</span>
+      </div>
+      <div class="topnav-right">
+        <button class="nav-tab active" id="tabChat" onclick="switchTab('chat')">💬 Chat</button>
+        <button class="nav-tab" id="tabCatalog" onclick="switchTab('catalog')">📖 Catalog</button>
+        <button class="nav-tab" id="tabMyBooks" onclick="switchTab('mybooks')">📋 My Books</button>
+      </div>
+    </header>
+
+    <!-- ── CHAT VIEW ──────────────────────────────────── -->
+    <div class="view" id="viewChat">
+      <div class="chat-container">
+        <div class="chat-messages" id="chatMessages">
+          <!-- Welcome message -->
+          <div class="message bot-message">
+            <div class="message-avatar">🤖</div>
+            <div class="message-bubble">
+              <p><strong>Hello! I'm LibraryBot</strong> — your intelligent library assistant powered by <strong>IBM Granite AI</strong>.</p>
+              <p>I can help you:</p>
+              <ul>
+                <li>🔍 Find books by topic, subject, or course</li>
+                <li>📊 Check real-time availability</li>
+                <li>📌 Reserve books or join the waitlist</li>
+                <li>🎓 Get personalized recommendations</li>
+              </ul>
+              <p>Set up your <strong>Student Profile</strong> and connect your <strong>IBM API Key</strong> in the sidebar to get started!</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="chat-input-row">
+          <div class="typing-indicator" id="typingIndicator" style="display:none;">
+            <span></span><span></span><span></span> LibraryBot is thinking…
+          </div>
+          <div class="input-bar">
+            <textarea class="chat-textarea" id="chatInput" placeholder="Ask about books, topics, reservations…" rows="1"></textarea>
+            <button class="send-btn" id="sendBtn" title="Send">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                <line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/>
+              </svg>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── CATALOG VIEW ───────────────────────────────── -->
+    <div class="view hidden" id="viewCatalog">
+      <div class="catalog-toolbar">
+        <input class="catalog-search" id="catalogSearch" placeholder="🔍 Search by title, author, topic…" />
+        <select class="catalog-filter" id="catalogSubject">
+          <option value="">All Subjects</option>
+        </select>
+        <label class="toggle-label">
+          <input type="checkbox" id="filterAvailable" /> Available Only
+        </label>
+      </div>
+      <div class="catalog-grid" id="catalogGrid"><!-- filled by JS --></div>
+    </div>
+
+    <!-- ── MY BOOKS VIEW ─────────────────────────────── -->
+    <div class="view hidden" id="viewMyBooks">
+      <div class="mybooks-container">
+        <div class="mybooks-header">
+          <h2>My Books</h2>
+          <p>Your active reservations and waitlist positions. Return a book when you're done.</p>
+        </div>
+        <div id="myBooksGrid" class="mybooks-grid">
+          <div class="empty-state" style="padding:40px;text-align:center;color:var(--muted);">
+            Set up your Student Profile to see your books.
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </main>
+
+  <!-- ── RESERVE MODAL ─────────────────────────────────── -->
+  <div class="modal-overlay" id="reserveModal" style="display:none;">
+    <div class="modal">
+      <div class="modal-header">
+        <h2 id="modalBookTitle">Reserve Book</h2>
+        <button class="modal-close" onclick="closeModal()">✕</button>
+      </div>
+      <div class="modal-body" id="modalBody"></div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" onclick="closeModal()">Cancel</button>
+        <button class="btn btn-primary" id="confirmReserve">Reserve / Waitlist</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── TOAST ──────────────────────────────────────────── -->
+  <div class="toast" id="toast"></div>
+
+  <script src="app.js"></script>
+</body>
+</html>
